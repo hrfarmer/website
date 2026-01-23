@@ -1,0 +1,17 @@
+---
+const links = ["", "projects", "contact"];
+const pathname = Astro.url.pathname.split("/")[1];
+---
+
+<div class="w-full h-14 flex items-center px-4 gap-8">
+  {
+    links.map((l) => (
+      <a
+        class={`${pathname === l ? "underline" : ""} hover:bg-white hover:text-black p-1.5 hover:cursor-pointer transition-colors`}
+        href={`/${l}`}
+      >
+        {l === "" ? "home" : l}
+      </a>
+    ))
+  }
+</div>

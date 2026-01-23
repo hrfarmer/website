@@ -1,1 +1,13 @@
 @import "tailwindcss";
+
+@font-face {
+    font-family: "GoogleSansCode";
+    src: url("/fonts/GoogleSansCode.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@theme {
+    --font-sans: "GoogleSansCode", ui-sans-serif, system-ui, sans-serif;
+}
