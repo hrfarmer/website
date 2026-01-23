@@ -10,11 +10,11 @@ import Header from "../components/Header.astro";
     <meta name="viewport" content="width=device-width" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
-    <title>Astro Basics</title>
+    <title>aychar.dev</title>
   </head>
-  <body class="bg-black text-white m-0 w-full h-full">
+  <body class="bg-black text-white m-0 w-screen h-screen flex flex-col overflow-hidden">
     <Header />
-    <div class="p-4">
+    <div class="p-4 w-full flex-1 min-h-0">
       <slot />
     </div>
   </body>

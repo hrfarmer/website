@@ -1,7 +1,82 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import { Icon } from "astro-icon/components";
+
+const links: {
+  name: string;
+  iconName: string;
+  url: string;
+  color: string;
+  textColor: "white" | "black";
+}[] = [
+  {
+    name: "github",
+    iconName: "github",
+    url: "https://github.com/hrfarmer",
+    color: "#FFFFFF",
+    textColor: "black",
+  },
+  {
+    name: "twitter/x",
+    iconName: "x",
+    url: "https://x.com/aychar_bot",
+    color: "#FFFFFF",
+    textColor: "black",
+  },
+  {
+    name: "bluesky",
+    iconName: "bluesky",
+    url: "https://bsky.app/profile/aychar.dev",
+    color: "#1185FE",
+    textColor: "white",
+  },
+  {
+    name: "val tracker",
+    iconName: "valorant",
+    url: "https://tracker.gg/valorant/profile/riot/Back%20On%20Track%23umm/overview?platform=pc&playlist=competitive&season=3ea2b318-423b-cf86-25da-7cbb0eefbe2d",
+    color: "#FA4454",
+    textColor: "white",
+  },
+  {
+    name: "osu!",
+    iconName: "osu",
+    url: "https://osu.ppy.sh/users/13473514",
+    color: "#FF66AA",
+    textColor: "white",
+  },
+];
 ---
 
 <Layout>
-  <div class="font-bold">hi</div>
+  <div class="w-full max-w-225 h-full flex flex-col justify-center">
+    <p class="font-black text-4xl mb-3">aychar.dev</p>
+    <p>hey, i'm aychar</p>
+    <p>
+      i'm a (student) software engineer looking to get into the aerospace
+      industry
+    </p>
+    <p class="mb-2">
+      i've worked on some <a
+        class="underline hover:bg-white hover:text-black transition-colors px-1 -mx-1 hover:cursor-pointer"
+        href="/projects">cool projects</a
+      > with cool people
+    </p>
+    <div class="flex items-center gap-3">
+      {
+        links.map((l) => (
+          <a
+            class="flex items-center border border-neutral-200 w-fit h-12 p-2 group hover:gap-2 transition-all hover:cursor-pointer hover:bg-[var(--link-color)] hover:text-[var(--text-color)] hover:border-[var(--link-color)]"
+            style={`--link-color: ${l.color}; --text-color: ${l.textColor}`}
+            href={l.url}
+            target="_blank"
+          >
+            <Icon size={28} name={l.iconName} />
+            <div class="grid grid-cols-[0fr] group-hover:grid-cols-[1fr] transition-all duration-300">
+              <p class="overflow-hidden">{l.name}</p>
+            </div>
+          </a>
+        ))
+      }
+    </div>
+  </div>
 </Layout>
