@@ -14,27 +14,10 @@ type GithubTimelineEvent = {
   linesRemoved: number;
 };
 
-type ValorantTimelineEvent = {
-  url: string;
-  eventTime: number;
-  mapName: string;
-  kda: [number, number, number];
-  result: "w" | "l" | "d";
-  score: [number, number];
-  rank: string;
-  rr: number;
-};
-
-type TimelineData = Array<
-  | {
-      type: "github";
-      data: GithubTimelineEvent;
-    }
-  | {
-      type: "valorant";
-      data: ValorantTimelineEvent;
-    }
->;
+type TimelineData = Array<{
+  type: "github";
+  data: GithubTimelineEvent;
+}>;
 
 export default function Timeline() {
   const data: TimelineData = [
@@ -63,19 +46,6 @@ export default function Timeline() {
         linesRemoved: 13,
       },
     },
-    {
-      type: "valorant",
-      data: {
-        url: "",
-        eventTime: Date.now(),
-        mapName: "Bind",
-        kda: [21, 12, 4],
-        result: "w",
-        score: [13, 6],
-        rank: "DIAMOND 1",
-        rr: 24,
-      },
-    },
   ];
 
   return (
@@ -83,8 +53,6 @@ export default function Timeline() {
       {data.map((i) => {
         if (i.type === "github") {
           return <GithubTimelineItem item={i.data} />;
-        } else if (i.type === "valorant") {
-          return <ValorantTimelineItem item={i.data} />;
         }
       })}
     </div>
@@ -159,46 +127,4 @@ function GithubTimelineItem({ item }: { item: GithubTimelineEvent }) {
       </TimelineItemWrapper>
     );
   }
-}
-
-function ValorantTimelineItem({ item }: { item: ValorantTimelineEvent }) {
-  return (
-    <TimelineItemWrapper>
-      <IconWrapper>
-        <SiValorant size={20} />
-      </IconWrapper>
-      <div>
-        <p>{item.mapName}</p>
-        <p className="text-xs text-neutral-400">
-          {item.kda[0]}/{item.kda[1]}/{item.kda[2]} | 24m
-        </p>
-      </div>
-
-      <div className="flex flex-1 flex-col items-center">
-        <p className="text-green-500">
-          {item.result === "w"
-            ? "VICTORY"
-            : item.result === "l"
-              ? "LOSS"
-              : "DRAW"}
-        </p>
-        <p className="text-sm text-neutral-400">
-          {item.score[0]}-{item.score[1]}
-        </p>
-      </div>
-
-      <div className="flex items-center gap-3">
-        <div className="flex flex-col items-end">
-          <p className="text-sm text-pink-400">{item.rank}</p>
-          <p className="text-sm text-green-500">
-            {item.rr >= 0 ? "+" : "-"}
-            {item.rr} RR
-          </p>
-        </div>
-        <a href={item.url}>
-          <MdArrowOutward size={20} />
-        </a>
-      </div>
-    </TimelineItemWrapper>
-  );
 }
