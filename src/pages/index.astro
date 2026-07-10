@@ -12,30 +12,42 @@ const links = [
 ---
 
 <Layout>
-  <main class="home-shell">
-    <section class="intro-panel">
-      <div class="intro-copy">
-        <p class="site-name">aychar.dev<span class="accent">_</span></p>
-        <p class="kicker">hey, i'm aychar</p>
-        <p class="lede">
-          i'm a (student) software engineer looking to get into the aerospace industry
-        </p>
-        <p class="supporting">
-          i've worked on some <a href="/projects">cool projects</a>, go look at them :D
-        </p>
-        <div class="socials" aria-label="Social links">
-          {links.map((link) => (
-            <a class="social-link" style={`--accent: ${link.accent}`} href={link.url} target="_blank" rel="noreferrer" aria-label={link.name}>
-              <Icon size={21} name={link.icon} />
-              <span>{link.name}</span>
-            </a>
-          ))}
-        </div>
-      </div>
-    </section>
+<main class="relative z-1 grid min-h-[calc(100vh-70px)] grid-cols-1 p-4 md:grid-cols-2">
+  <section class="flex min-h-[calc(100svh-102px)] items-start px-5 py-8 md:min-h-[calc(100vh-102px)] md:p-[clamp(32px,5vw,72px)]">
+    <div class="max-w-[700px]">
+      <p class="font-display mb-7 text-[clamp(36px,4.4vw,66px)] leading-none tracking-[-0.035em]">
+        aychar<span class="text-[#35a7ff]">_</span>
+      </p>
+      <p class="mb-2 text-[15px] text-[#f0f0ed]">hey, i'm aychar</p>
+      <p class="m-0 max-w-[600px] text-sm leading-[1.65] text-[#c7c8c4]">
+        i'm a (student) software engineer looking to get into the aerospace industry
+      </p>
+      <p class="mb-[26px] mt-0 max-w-[600px] text-sm leading-[1.65] text-[#c7c8c4]">
+        i've worked on some <a class="text-[#f0f0ed] underline underline-offset-3 transition-colors hover:text-[#35a7ff]" href="/projects">cool projects</a>, go look at them :D
+      </p>
 
-    <section class="future-panel" aria-label="Reserved for future content">
-      <span class="future-label">// reserved</span>
-    </section>
-  </main>
+      <div class="flex flex-wrap gap-2" aria-label="Social links">
+        {links.map((link) => (
+          <a
+            class="group flex h-[42px] min-w-[42px] items-center gap-0 overflow-hidden border border-white/10 bg-[#070807a6] px-2.5 transition-[border-color,color,box-shadow,gap] duration-250 hover:gap-[9px] hover:border-[var(--accent)] hover:text-[var(--accent)] hover:shadow-[0_0_22px_color-mix(in_srgb,var(--accent)_18%,transparent)] focus-visible:gap-[9px] focus-visible:border-[var(--accent)] focus-visible:text-[var(--accent)]"
+            style={`--accent: ${link.accent}`}
+            href={link.url}
+            target="_blank"
+            rel="noreferrer"
+            aria-label={link.name}
+          >
+            <Icon size={21} name={link.icon} />
+            <span class="max-w-0 whitespace-nowrap text-[10px] uppercase opacity-0 transition-[max-width,opacity] duration-300 group-hover:max-w-[110px] group-hover:opacity-100 group-focus-visible:max-w-[110px] group-focus-visible:opacity-100">
+              {link.name}
+            </span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="relative min-h-[48svh] border-t border-white/10 md:min-h-[calc(100vh-102px)] md:border-l md:border-t-0" aria-label="Reserved for future content">
+    <span class="absolute bottom-4 right-[18px] text-[9px] uppercase tracking-[0.12em] text-white/18">// reserved</span>
+  </section>
+</main>
 </Layout>

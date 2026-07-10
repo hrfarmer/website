@@ -13,9 +13,31 @@ import Header from "../components/Header.astro";
     <meta name="generator" content={Astro.generator} />
     <title>aychar — software engineer</title>
   </head>
-  <body>
-    <div class="grid-background" aria-hidden="true"></div>
+  <body class="m-0 min-h-screen overflow-x-hidden bg-[#080908] font-mono text-[#f0f0ed]">
+    <div class="animate-grid-drift pointer-events-none fixed -inset-12 bg-[linear-gradient(rgba(255,255,255,.06)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.06)_1px,transparent_1px)] bg-[size:36px_36px] opacity-35 [mask-image:radial-gradient(ellipse_at_center,black_18%,transparent_82%)] motion-reduce:animate-none" aria-hidden="true"></div>
+    <div id="grid-light" class="animate-grid-drift pointer-events-none fixed -inset-12 bg-[linear-gradient(rgba(53,167,255,.38)_1px,transparent_1px),linear-gradient(90deg,rgba(53,167,255,.38)_1px,transparent_1px)] bg-[size:36px_36px] opacity-75 [mask-image:radial-gradient(circle_120px_at_var(--mouse-x,50%)_var(--mouse-y,50%),black,transparent)] motion-reduce:hidden" aria-hidden="true"></div>
     <Header />
     <slot />
+    <script>
+      const gridLight = document.querySelector<HTMLElement>("#grid-light");
+
+      if (gridLight && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        let frame = 0;
+        let mouseX = window.innerWidth / 2;
+        let mouseY = window.innerHeight / 2;
+
+        window.addEventListener("pointermove", (event) => {
+          mouseX = event.clientX + 48;
+          mouseY = event.clientY + 48;
+
+          if (frame) return;
+          frame = window.requestAnimationFrame(() => {
+            gridLight.style.setProperty("--mouse-x", `${mouseX}px`);
+            gridLight.style.setProperty("--mouse-y", `${mouseY}px`);
+            frame = 0;
+          });
+        }, { passive: true });
+      }
+    </script>
   </body>
 </html>
