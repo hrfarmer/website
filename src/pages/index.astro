@@ -1,96 +1,41 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import { Icon } from "astro-icon/components";
-import Timeline from "../components/Timeline";
 
-const links: {
-  name: string;
-  iconName: string;
-  url: string;
-  color: string;
-  textColor: "white" | "black";
-}[] = [
-  {
-    name: "github",
-    iconName: "github",
-    url: "https://github.com/hrfarmer",
-    color: "#FFFFFF",
-    textColor: "black",
-  },
-  {
-    name: "twitter/x",
-    iconName: "x",
-    url: "https://x.com/aychar_bot",
-    color: "#FFFFFF",
-    textColor: "black",
-  },
-  {
-    name: "bluesky",
-    iconName: "bluesky",
-    url: "https://bsky.app/profile/aychar.dev",
-    color: "#1185FE",
-    textColor: "white",
-  },
-  {
-    name: "val tracker",
-    iconName: "valorant",
-    url: "https://tracker.gg/valorant/profile/riot/Back%20On%20Track%23umm/overview?platform=pc&playlist=competitive&season=3ea2b318-423b-cf86-25da-7cbb0eefbe2d",
-    color: "#FA4454",
-    textColor: "white",
-  },
-  {
-    name: "osu!",
-    iconName: "osu",
-    url: "https://osu.ppy.sh/users/13473514",
-    color: "#FF66AA",
-    textColor: "white",
-  },
+const links = [
+  { name: "github", icon: "github", url: "https://github.com/hrfarmer", accent: "#f4f4f0" },
+  { name: "twitter / x", icon: "x", url: "https://x.com/aychar_bot", accent: "#f4f4f0" },
+  { name: "bluesky", icon: "bluesky", url: "https://bsky.app/profile/aychar.dev", accent: "#1185fe" },
+  { name: "valorant", icon: "valorant", url: "https://tracker.gg/valorant/profile/riot/Back%20On%20Track%23umm/overview?platform=pc&playlist=competitive&season=3ea2b318-423b-cf86-25da-7cbb0eefbe2d", accent: "#fa4454" },
+  { name: "osu!", icon: "osu", url: "https://osu.ppy.sh/users/13473514", accent: "#ff66aa" },
 ];
 ---
 
 <Layout>
-  <div class="w-full h-full flex flex-col lg:flex-row">
-    <!-- Left side -->
-    <div
-      class="w-full lg:w-1/2 h-full flex flex-col justify-center px-6 lg:px-12"
-    >
-      <div class="max-w-225">
-        <p class="font-black text-4xl mb-3">aychar.dev</p>
-        <p>hey, i'm aychar</p>
-        <p>
-          i'm a (student) software engineer looking to get into the aerospace
-          industry
+  <main class="home-shell">
+    <section class="intro-panel">
+      <div class="intro-copy">
+        <p class="site-name">aychar.dev<span class="accent">_</span></p>
+        <p class="kicker">hey, i'm aychar</p>
+        <p class="lede">
+          i'm a (student) software engineer looking to get into the aerospace industry
         </p>
-        <p class="mb-2">
-          i've worked on some <a
-            class="underline hover:bg-white hover:text-black transition-colors px-1 -mx-1 hover:cursor-pointer"
-            href="/projects">cool projects</a
-          >, go look at them :D
+        <p class="supporting">
+          i've worked on some <a href="/projects">cool projects</a>, go look at them :D
         </p>
-        <div class="flex items-center gap-3">
-          {
-            links.map((l) => (
-              <a
-                class="flex items-center border border-neutral-200 w-fit h-12 p-2 group hover:gap-2 transition-all hover:cursor-pointer hover:bg-[var(--link-color)] hover:text-[var(--text-color)] hover:border-[var(--link-color)]"
-                style={`--link-color: ${l.color}; --text-color: ${l.textColor}`}
-                href={l.url}
-                target="_blank"
-              >
-                <Icon size={28} name={l.iconName} />
-                <div class="grid grid-cols-[0fr] group-hover:grid-cols-[1fr] transition-all duration-300">
-                  <p class="overflow-hidden">{l.name}</p>
-                </div>
-              </a>
-            ))
-          }
+        <div class="socials" aria-label="Social links">
+          {links.map((link) => (
+            <a class="social-link" style={`--accent: ${link.accent}`} href={link.url} target="_blank" rel="noreferrer" aria-label={link.name}>
+              <Icon size={21} name={link.icon} />
+              <span>{link.name}</span>
+            </a>
+          ))}
         </div>
       </div>
-    </div>
-    <!-- Right side -->
-    <div
-      class="w-full lg:w-1/2 h-full flex items-center justify-center px-6 lg:px-12"
-    >
-      <Timeline client:load />
-    </div>
-  </div>
+    </section>
+
+    <section class="future-panel" aria-label="Reserved for future content">
+      <span class="future-label">// reserved</span>
+    </section>
+  </main>
 </Layout>

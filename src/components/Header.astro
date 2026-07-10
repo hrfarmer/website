@@ -1,17 +1,10 @@
 ---
-const links = ["", "projects", "contact"];
-const pathname = Astro.url.pathname.split("/")[1];
+const links = [{ label: "home", href: "/" }, { label: "projects", href: "/projects" }, { label: "contact", href: "/contact" }];
+const pathname = Astro.url.pathname;
 ---
 
-<div class="w-full h-14 flex items-center px-4 gap-8">
-  {
-    links.map((l) => (
-      <a
-        class={`${pathname === l ? "underline" : ""} hover:bg-white hover:text-black p-1.5 hover:cursor-pointer transition-colors`}
-        href={`/${l}`}
-      >
-        {l === "" ? "home" : l}
-      </a>
-    ))
-  }
-</div>
+<header class="site-header">
+  <nav aria-label="Primary navigation">
+    {links.map((link) => <a class:list={["nav-link", { active: pathname === link.href }]} href={link.href}>{link.label}</a>)}
+  </nav>
+</header>

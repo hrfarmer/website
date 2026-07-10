@@ -7,15 +7,15 @@ import Header from "../components/Header.astro";
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="aychar — student software engineer building toward aerospace." />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
-    <title>aychar.dev</title>
+    <title>aychar — software engineer</title>
   </head>
-  <body class="bg-black text-white m-0 w-screen h-screen flex flex-col overflow-hidden">
+  <body>
+    <div class="grid-background" aria-hidden="true"></div>
     <Header />
-    <div class="p-4 w-full flex-1 min-h-0">
-      <slot />
-    </div>
+    <slot />
   </body>
 </html>
