@@ -12,10 +12,12 @@
     "@tailwindcss/vite": "^4.1.18",
     "astro": "^5.16.11",
     "astro-icon": "^1.1.5",
-    "tailwindcss": "^4.1.18"
+    "tailwindcss": "^4.1.18",
+    "three": "^0.185.1"
   },
   "devDependencies": {
     "@types/node": "^25.0.10",
+    "@types/three": "^0.185.1",
     "prettier": "^3.8.0",
     "prettier-plugin-astro": "^0.14.1"
   }
