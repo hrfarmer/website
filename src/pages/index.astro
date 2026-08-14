@@ -1,129 +1,116 @@
 ---
-import Layout from "../layouts/Layout.astro";
-import { Icon } from "astro-icon/components";
-import EarthGlobe from "../components/EarthGlobe.astro";
-
 const links = [
-  {
-    name: "github",
-    icon: "github",
-    url: "https://github.com/hrfarmer",
-    accent: "#f4f4f0",
-  },
-  {
-    name: "twitter / x",
-    icon: "x",
-    url: "https://x.com/aychar_bot",
-    accent: "#f4f4f0",
-  },
-  {
-    name: "valorant",
-    icon: "valorant",
-    url: "https://tracker.gg/valorant/profile/riot/Back%20On%20Track%23umm/overview?platform=pc&playlist=competitive&season=3ea2b318-423b-cf86-25da-7cbb0eefbe2d",
-    accent: "#fa4454",
-  },
-  {
-    name: "osu!",
-    icon: "osu",
-    url: "https://osu.ppy.sh/users/13473514",
-    accent: "#ff66aa",
-  },
+  { label: "github", href: "https://github.com/hrfarmer", external: true },
+  { label: "blog", href: "/blog" },
+  // Replace this placeholder with your Twitter URL when it is ready.
+  { label: "twitter", href: "#" },
 ];
 ---
 
-<Layout>
-  <main
-    id="home-shell"
-    data-expanded="false"
-    class="group/layout relative z-1 grid min-h-[calc(100vh-70px)] grid-cols-1 p-4 md:grid-cols-[40%_60%] md:transition-[grid-template-columns] md:duration-700 md:ease-[cubic-bezier(.76,0,.24,1)] md:will-change-[grid-template-columns] md:data-[expanded=true]:grid-cols-[0%_100%]"
-  >
-    <section
-      class="flex min-h-[calc(100svh-102px)] items-start overflow-hidden px-5 py-8 transition-[opacity,transform] duration-700 ease-[cubic-bezier(.76,0,.24,1)] will-change-transform group-data-[expanded=true]/layout:pointer-events-none group-data-[expanded=true]/layout:-translate-x-12 group-data-[expanded=true]/layout:opacity-0 md:min-h-[calc(100vh-102px)] md:p-[clamp(32px,5vw,72px)]"
-    >
-      <div
-        class="w-full max-w-[700px] md:w-[max(280px,calc(40vw-clamp(64px,10vw,144px)))] md:flex-none"
-      >
-        <p
-          class="font-display mb-7 text-[clamp(36px,4.4vw,66px)] leading-none tracking-[-0.035em]"
-        >
-          aychar<span class="text-[#35a7ff]">_</span>
-        </p>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content="zltl on the web" />
+    <title>zltl</title>
+  </head>
+  <body>
+    <main>
+      <h1>zltl</h1>
 
-        <p class="m-0 max-w-[600px] text-sm leading-[1.65] text-[#c7c8c4]"></p>
-        <!-- <p
-          class="mb-[26px] mt-0 max-w-[600px] text-sm leading-[1.65] text-[#c7c8c4]"
-        >
-          i've worked on some <a
-            class="text-[#f0f0ed] underline underline-offset-3 transition-colors hover:text-[#35a7ff]"
-            href="/projects">cool projects</a
-          >, go look at them :D
-        </p> -->
+      <nav aria-label="Links">
+        {
+          links.map((link) => (
+            <a
+              href={link.href}
+              target={link.external ? "_blank" : undefined}
+              rel={link.external ? "noreferrer" : undefined}
+            >
+              {link.label}
+            </a>
+          ))
+        }
+      </nav>
+    </main>
+  </body>
+</html>
 
-        <div class="flex flex-wrap gap-2" aria-label="Social links">
-          {
-            links.map((link) => (
-              <a
-                class="group/social flex h-[42px] min-w-[42px] items-center gap-0 overflow-hidden border border-white/10 bg-[#070807a6] px-2.5 transition-[border-color,color,box-shadow,gap] duration-250 hover:gap-[9px] hover:border-[var(--accent)] hover:text-[var(--accent)] hover:shadow-[0_0_22px_color-mix(in_srgb,var(--accent)_18%,transparent)] focus-visible:gap-[9px] focus-visible:border-[var(--accent)] focus-visible:text-[var(--accent)]"
-                style={`--accent: ${link.accent}`}
-                href={link.url}
-                target="_blank"
-                rel="noreferrer"
-                aria-label={link.name}
-              >
-                <Icon size={21} name={link.icon} />
-                <span class="max-w-0 overflow-hidden whitespace-nowrap text-[10px] uppercase opacity-0 transition-[max-width,opacity] duration-300 group-hover/social:max-w-[110px] group-hover/social:opacity-100 group-focus-visible/social:max-w-[110px] group-focus-visible/social:opacity-100">
-                  {link.name}
-                </span>
-              </a>
-            ))
-          }
-        </div>
-        <p class="pt-4">something will be there soon trust...</p>
-      </div>
-    </section>
+<style>
+  :global(*) {
+    box-sizing: border-box;
+  }
 
-    <section
-      class="relative -mb-4 -mr-4 min-h-[calc(60svh+16px)] overflow-hidden border-t border-white/10 md:min-h-[calc(100vh-86px)] md:border-l md:border-t-0 md:transition-[border-color] md:duration-500 md:group-data-[expanded=true]/layout:border-transparent"
-      aria-label="Interactive Earth viewer"
-    >
-      <EarthGlobe />
-      <button
-        id="expand-earth"
-        type="button"
-        aria-label="Expand Earth viewer"
-        aria-expanded="false"
-        class="absolute right-4 top-4 z-10 flex items-center gap-2 border border-white/15 bg-[#080908b8] px-3 py-2 text-[9px] uppercase tracking-[0.12em] text-white/55 backdrop-blur-sm transition-colors hover:border-[#35a7ff]/60 hover:text-white focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-[#35a7ff] group-data-[expanded=true]/layout:pointer-events-none group-data-[expanded=true]/layout:opacity-0"
-      >
-        expand <span aria-hidden="true">↗</span>
-      </button>
-      <button
-        id="collapse-earth"
-        type="button"
-        aria-label="Restore site content"
-        class="pointer-events-none absolute left-0 top-1/2 z-10 flex h-14 w-9 -translate-y-1/2 items-center justify-center border border-l-0 border-white/15 bg-[#080908cc] text-xl text-white/55 opacity-0 backdrop-blur-sm transition-[opacity,color,border-color] hover:border-[#35a7ff]/60 hover:text-white focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-[#35a7ff] group-data-[expanded=true]/layout:pointer-events-auto group-data-[expanded=true]/layout:opacity-100"
-      >
-        <span aria-hidden="true">›</span>
-      </button>
-    </section>
-  </main>
-  <script>
-    const shell = document.querySelector<HTMLElement>("#home-shell");
-    const expandButton =
-      document.querySelector<HTMLButtonElement>("#expand-earth");
-    const collapseButton =
-      document.querySelector<HTMLButtonElement>("#collapse-earth");
+  :global(html) {
+    background: #999999;
+  }
 
-    const setExpanded = (expanded: boolean) => {
-      if (!shell || !expandButton) return;
-      shell.dataset.expanded = String(expanded);
-      expandButton.setAttribute("aria-expanded", String(expanded));
-      window.dispatchEvent(
-        new CustomEvent("earth-view-mode", { detail: { expanded } }),
-      );
-      if (!expanded) expandButton.focus();
-    };
+  :global(body) {
+    margin: 0;
+    background: #999999;
+    color: #333333;
+    font-family:
+      ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+      "Courier New", monospace;
+  }
 
-    expandButton?.addEventListener("click", () => setExpanded(true));
-    collapseButton?.addEventListener("click", () => setExpanded(false));
-  </script>
-</Layout>
+  main {
+    display: flex;
+    min-height: 100vh;
+    min-height: 100svh;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: clamp(1.25rem, 4vw, 2rem);
+    padding: 2rem 1.25rem;
+    text-align: center;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: clamp(2.75rem, 12vw, 5rem);
+    font-weight: 500;
+    letter-spacing: -0.08em;
+    line-height: 1;
+  }
+
+  nav {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem 1.25rem;
+  }
+
+  a {
+    color: inherit;
+    font-size: clamp(0.9rem, 3.5vw, 1rem);
+    line-height: 1.5;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.25em;
+    transition: color 150ms ease;
+  }
+
+  a:hover {
+    color: #202020;
+  }
+
+  a:focus-visible {
+    border-radius: 2px;
+    outline: 2px solid currentColor;
+    outline-offset: 4px;
+  }
+
+  @media (max-width: 24rem) {
+    nav {
+      flex-direction: column;
+      gap: 0.65rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    a {
+      transition: none;
+    }
+  }
+</style>
