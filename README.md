@@ -11,6 +11,13 @@ npm install
 npm run dev
 ```
 
+Production uses Astro's standalone Node server:
+
+```sh
+npm run build
+npm start
+```
+
 Blog posts live in `src/content/blog` as `.md` or `.mdx` files. Each post uses this frontmatter:
 
 ```yaml
@@ -27,7 +34,9 @@ draft: false
 Views, likes, and comments are stored in `data/blog.sqlite` by default. The database file is intentionally ignored by Git. Set `BLOG_DB_PATH` to an absolute path on a persistent volume in production:
 
 ```sh
-BLOG_DB_PATH=/var/lib/zltl/blog.sqlite node ./dist/server/entry.mjs
+BLOG_DB_PATH=/data/blog.sqlite npm start
 ```
 
 The deployment must use a persistent filesystem; ephemeral serverless filesystems will lose engagement data between deployments or instance restarts.
+
+The Coolify application uses a persistent volume mounted at `/data`, with `BLOG_DB_PATH=/data/blog.sqlite`, `HOST=0.0.0.0`, and `PORT=3000` configured as runtime variables.
