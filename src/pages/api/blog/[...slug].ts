@@ -20,6 +20,37 @@ const json = (data: unknown, status = 200) =>
     },
   });
 
+const firstForwardedValue = (value: string | null) =>
+  value?.split(",", 1)[0]?.trim();
+
+function isSameOriginRequest(request: Request): boolean {
+  const origin = request.headers.get("origin");
+  if (!origin) return false;
+
+  try {
+    const originUrl = new URL(origin);
+    const requestUrl = new URL(request.url);
+    const host =
+      firstForwardedValue(request.headers.get("x-forwarded-host")) ??
+      firstForwardedValue(request.headers.get("host")) ??
+      requestUrl.host;
+    const forwardedProtocol = firstForwardedValue(
+      request.headers.get("x-forwarded-proto"),
+    );
+    const protocol = forwardedProtocol
+      ? `${forwardedProtocol.replace(/:$/, "").toLowerCase()}:`
+      : requestUrl.protocol;
+
+    return (
+      (protocol === "http:" || protocol === "https:") &&
+      originUrl.protocol === protocol &&
+      originUrl.host.toLowerCase() === host.toLowerCase()
+    );
+  } catch {
+    return false;
+  }
+}
+
 async function getPublishedPost(slug: string | undefined) {
   if (!slug) return undefined;
   const post = await getEntry("blog", slug);
@@ -54,9 +85,7 @@ export const GET: APIRoute = async ({ params, cookies }) => {
 };
 
 export const POST: APIRoute = async ({ request, params, cookies }) => {
-  const requestUrl = new URL(request.url);
-  const origin = request.headers.get("origin");
-  if (!origin || origin !== requestUrl.origin) {
+  if (!isSameOriginRequest(request)) {
     return json({ error: "Invalid request origin." }, 403);
   }
 
