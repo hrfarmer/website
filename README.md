@@ -39,4 +39,4 @@ BLOG_DB_PATH=/data/blog.sqlite npm start
 
 The deployment must use a persistent filesystem; ephemeral serverless filesystems will lose engagement data between deployments or instance restarts.
 
-The Coolify application uses a persistent volume mounted at `/data`, with `BLOG_DB_PATH=/data/blog.sqlite`, `HOST=0.0.0.0`, and `PORT=3000` configured as runtime variables.
+The Coolify application uses a persistent volume mounted at `/data`, with `BLOG_DB_PATH=/data/blog.sqlite`, `HOST=0.0.0.0`, `PORT=3000`, and `BLOG_ALLOWED_ORIGINS=https://aychar.dev,https://www.aychar.dev` configured as runtime variables.

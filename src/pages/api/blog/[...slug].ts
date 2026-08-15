@@ -23,12 +23,33 @@ const json = (data: unknown, status = 200) =>
 const firstForwardedValue = (value: string | null) =>
   value?.split(",", 1)[0]?.trim();
 
+const configuredOrigins = new Set(
+  (process.env.BLOG_ALLOWED_ORIGINS ?? "")
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean)
+    .flatMap((origin) => {
+      try {
+        const url = new URL(origin);
+        return url.protocol === "http:" || url.protocol === "https:"
+          ? [url.origin]
+          : [];
+      } catch {
+        return [];
+      }
+    }),
+);
+
 function isSameOriginRequest(request: Request): boolean {
   const origin = request.headers.get("origin");
   if (!origin) return false;
 
   try {
     const originUrl = new URL(origin);
+    if (configuredOrigins.size > 0) {
+      return configuredOrigins.has(originUrl.origin);
+    }
+
     const requestUrl = new URL(request.url);
     const host =
       firstForwardedValue(request.headers.get("x-forwarded-host")) ??
