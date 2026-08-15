@@ -1,0 +1,76 @@
+---
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = "zltl on the web" } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    color-scheme: light;
+    background: #999999;
+    color: #333333;
+    font-family:
+      ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+      "Courier New", monospace;
+    font-synthesis: none;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    background: #999999;
+  }
+
+  body {
+    min-height: 100vh;
+    margin: 0;
+    background: #999999;
+    color: #333333;
+  }
+
+  a {
+    color: inherit;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.25em;
+  }
+
+  a:hover {
+    color: #202020;
+  }
+
+  :focus-visible {
+    border-radius: 2px;
+    outline: 2px solid currentColor;
+    outline-offset: 4px;
+  }
+
+  button,
+  input,
+  textarea {
+    color: inherit;
+    font: inherit;
+  }
+
+  ::selection {
+    background: #333333;
+    color: #999999;
+  }
+</style>

@@ -1,0 +1,126 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+const posts = (await getCollection("blog", ({ data }) => {
+  return import.meta.env.PROD ? !data.draft : true;
+})).sort(
+  (a, b) => b.data.publishedAt.getTime() - a.data.publishedAt.getTime(),
+);
+
+const formatDate = (date: Date) =>
+  new Intl.DateTimeFormat("en", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    timeZone: "UTC",
+  }).format(date);
+---
+
+<BaseLayout title="blog · zltl" description="writing from zltl">
+  <main>
+    <a class="back" href="/">← zltl</a>
+
+    <header>
+      <h1>blog</h1>
+      <p>notes, projects, and other things.</p>
+    </header>
+
+    {
+      posts.length > 0 ? (
+        <ol class="posts">
+          {posts.map((post) => (
+            <li>
+              <a href={`/blog/${post.id}`}>
+                <span>{post.data.title}</span>
+                <time datetime={post.data.publishedAt.toISOString()}>
+                  {formatDate(post.data.publishedAt)}
+                </time>
+              </a>
+              <p>{post.data.description}</p>
+            </li>
+          ))}
+        </ol>
+      ) : (
+        <p class="empty">nothing here yet.</p>
+      )
+    }
+  </main>
+</BaseLayout>
+
+<style>
+  main {
+    width: min(100% - 2.5rem, 46rem);
+    margin-inline: auto;
+    padding-block: clamp(2rem, 8vw, 5rem);
+  }
+
+  .back {
+    display: inline-block;
+    margin-bottom: clamp(3rem, 10vw, 6rem);
+    font-size: 0.9rem;
+  }
+
+  header {
+    margin-bottom: 3rem;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: clamp(2.25rem, 8vw, 3.75rem);
+    font-weight: 500;
+    letter-spacing: -0.07em;
+    line-height: 1;
+  }
+
+  header p,
+  .empty {
+    margin: 0.9rem 0 0;
+    color: #414141;
+    line-height: 1.6;
+  }
+
+  .posts {
+    display: grid;
+    gap: 2rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .posts li {
+    padding-top: 1.25rem;
+    border-top: 1px solid rgb(51 51 51 / 28%);
+  }
+
+  .posts a {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+
+  .posts time {
+    flex: none;
+    color: #4a4a4a;
+    font-size: 0.75rem;
+    font-weight: 400;
+  }
+
+  .posts p {
+    margin: 0.6rem 0 0;
+    color: #414141;
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+
+  @media (max-width: 32rem) {
+    .posts a {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+  }
+</style>

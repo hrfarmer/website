@@ -1,0 +1,532 @@
+---
+import { getEntry, render } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import {
+  getBlogEngagement,
+  VISITOR_COOKIE,
+} from "../../lib/blog-db";
+
+export const prerender = false;
+
+const slug = Astro.params.slug;
+const post = slug ? await getEntry("blog", slug) : undefined;
+
+if (!post || (post.data.draft && import.meta.env.PROD)) {
+  return new Response("Post not found.", { status: 404 });
+}
+
+const { Content } = await render(post);
+const engagement = getBlogEngagement(
+  post.id,
+  Astro.cookies.get(VISITOR_COOKIE)?.value,
+);
+
+const formatDate = (date: Date) =>
+  new Intl.DateTimeFormat("en", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    timeZone: "UTC",
+  }).format(date);
+---
+
+<BaseLayout
+  title={`${post.data.title} · zltl`}
+  description={post.data.description}
+>
+  <main data-blog-shell data-blog-slug={post.id}>
+    <a class="back" href="/blog">← blog</a>
+
+    <article>
+      <header>
+        <h1>{post.data.title}</h1>
+        <p class="description">{post.data.description}</p>
+        <div class="meta">
+          <time datetime={post.data.publishedAt.toISOString()}>
+            {formatDate(post.data.publishedAt)}
+          </time>
+          <span aria-hidden="true">·</span>
+          <span><span class="view-count">{engagement.views}</span> views</span>
+        </div>
+      </header>
+
+      <div class="prose">
+        <Content />
+      </div>
+    </article>
+
+    <section class="engagement" aria-label="Post engagement">
+      <button
+        class="like-button"
+        type="button"
+        data-liked={String(engagement.liked)}
+        aria-pressed={engagement.liked}
+      >
+        <span class="like-label">{engagement.liked ? "liked" : "like"}</span>
+        <span aria-hidden="true">·</span>
+        <span class="like-count">{engagement.likes}</span>
+      </button>
+      <span class="like-status" role="status" aria-live="polite"></span>
+    </section>
+
+    <section class="comments" aria-labelledby="comments-heading">
+      <h2 id="comments-heading">
+        comments <span class="comment-count">({engagement.commentCount})</span>
+      </h2>
+
+      <div class="comments-list">
+        {
+          engagement.comments.length > 0 ? (
+            engagement.comments.map((comment) => (
+              <article class="comment" data-comment-id={comment.id}>
+                <header>
+                  <strong>{comment.author}</strong>
+                  <time datetime={comment.createdAt}>
+                    {formatDate(new Date(comment.createdAt))}
+                  </time>
+                </header>
+                <p>{comment.body}</p>
+              </article>
+            ))
+          ) : (
+            <p class="no-comments">no comments yet.</p>
+          )
+        }
+      </div>
+
+      <form class="comment-form">
+        <div class="field">
+          <label for="comment-author">name</label>
+          <input
+            id="comment-author"
+            name="author"
+            type="text"
+            maxlength="60"
+            autocomplete="name"
+            required
+          />
+        </div>
+
+        <div class="field">
+          <label for="comment-body">comment</label>
+          <textarea
+            id="comment-body"
+            name="body"
+            rows="5"
+            maxlength="2000"
+            required></textarea>
+        </div>
+
+        <div class="honeypot" aria-hidden="true">
+          <label for="comment-website">website</label>
+          <input
+            id="comment-website"
+            name="website"
+            type="text"
+            tabindex="-1"
+            autocomplete="off"
+          />
+        </div>
+
+        <div class="form-footer">
+          <button type="submit">post comment</button>
+          <p class="form-status" role="status" aria-live="polite"></p>
+        </div>
+      </form>
+    </section>
+  </main>
+</BaseLayout>
+
+<script>
+  interface BlogCommentResponse {
+    id: number;
+    author: string;
+    body: string;
+    createdAt: string;
+  }
+
+  interface EngagementResponse {
+    views: number;
+    likes: number;
+    liked: boolean;
+    commentCount: number;
+    comments: BlogCommentResponse[];
+  }
+
+  const shell = document.querySelector<HTMLElement>("[data-blog-shell]");
+  const slug = shell?.dataset.blogSlug;
+  const endpoint = slug ? `/api/blog/${encodeURIComponent(slug)}` : undefined;
+
+  const request = async (payload: Record<string, unknown>) => {
+    if (!endpoint) throw new Error("This post is unavailable.");
+
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "Something went wrong.");
+    }
+    return data;
+  };
+
+  const updateEngagement = (engagement: EngagementResponse) => {
+    const viewCount = document.querySelector<HTMLElement>(".view-count");
+    const likeCount = document.querySelector<HTMLElement>(".like-count");
+    const likeLabel = document.querySelector<HTMLElement>(".like-label");
+    const likeButton = document.querySelector<HTMLButtonElement>(".like-button");
+
+    if (viewCount) viewCount.textContent = String(engagement.views);
+    if (likeCount) likeCount.textContent = String(engagement.likes);
+    if (likeLabel) likeLabel.textContent = engagement.liked ? "liked" : "like";
+    if (likeButton) {
+      likeButton.dataset.liked = String(engagement.liked);
+      likeButton.setAttribute("aria-pressed", String(engagement.liked));
+    }
+  };
+
+  if (slug && !sessionStorage.getItem(`viewed:${slug}`)) {
+    sessionStorage.setItem(`viewed:${slug}`, "true");
+    request({ action: "view" })
+      .then(updateEngagement)
+      .catch(() => sessionStorage.removeItem(`viewed:${slug}`));
+  }
+
+  const likeButton = document.querySelector<HTMLButtonElement>(".like-button");
+  const likeStatus = document.querySelector<HTMLElement>(".like-status");
+  likeButton?.addEventListener("click", async () => {
+    likeButton.disabled = true;
+    if (likeStatus) likeStatus.textContent = "";
+    try {
+      const engagement = (await request({ action: "like" })) as EngagementResponse;
+      updateEngagement(engagement);
+    } catch (error) {
+      if (likeStatus) {
+        likeStatus.textContent =
+          error instanceof Error ? error.message : "Something went wrong.";
+      }
+    } finally {
+      likeButton.disabled = false;
+    }
+  });
+
+  const commentForm = document.querySelector<HTMLFormElement>(".comment-form");
+  const commentsList = document.querySelector<HTMLElement>(".comments-list");
+  const formStatus = document.querySelector<HTMLElement>(".form-status");
+
+  commentForm?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const submitButton = commentForm.querySelector<HTMLButtonElement>("button[type='submit']");
+    const formData = new FormData(commentForm);
+
+    if (submitButton) submitButton.disabled = true;
+    if (formStatus) formStatus.textContent = "posting…";
+
+    try {
+      const data = (await request({
+        action: "comment",
+        author: formData.get("author"),
+        body: formData.get("body"),
+        website: formData.get("website"),
+      })) as {
+        comment: BlogCommentResponse;
+        engagement: EngagementResponse;
+      };
+
+      document.querySelector(".no-comments")?.remove();
+
+      const comment = document.createElement("article");
+      comment.className = "comment";
+      comment.dataset.commentId = String(data.comment.id);
+
+      const header = document.createElement("header");
+      const author = document.createElement("strong");
+      const time = document.createElement("time");
+      const body = document.createElement("p");
+
+      author.textContent = data.comment.author;
+      time.dateTime = data.comment.createdAt;
+      time.textContent = new Intl.DateTimeFormat("en", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        timeZone: "UTC",
+      }).format(new Date(data.comment.createdAt));
+      body.textContent = data.comment.body;
+
+      header.append(author, time);
+      comment.append(header, body);
+      commentsList?.append(comment);
+
+      const commentCount = document.querySelector<HTMLElement>(".comment-count");
+      if (commentCount) {
+        commentCount.textContent = `(${data.engagement.commentCount})`;
+      }
+
+      commentForm.reset();
+      if (formStatus) formStatus.textContent = "comment posted.";
+    } catch (error) {
+      if (formStatus) {
+        formStatus.textContent =
+          error instanceof Error ? error.message : "Something went wrong.";
+      }
+    } finally {
+      if (submitButton) submitButton.disabled = false;
+    }
+  });
+</script>
+
+<style>
+  main {
+    width: min(100% - 2.5rem, 46rem);
+    margin-inline: auto;
+    padding-block: clamp(2rem, 8vw, 5rem);
+  }
+
+  .back {
+    display: inline-block;
+    margin-bottom: clamp(3rem, 10vw, 6rem);
+    font-size: 0.9rem;
+  }
+
+  article > header {
+    padding-bottom: 2rem;
+    border-bottom: 1px solid rgb(51 51 51 / 28%);
+  }
+
+  h1 {
+    max-width: 14ch;
+    margin: 0;
+    font-size: clamp(2.1rem, 8vw, 3.75rem);
+    font-weight: 500;
+    letter-spacing: -0.07em;
+    line-height: 1.05;
+  }
+
+  .description {
+    max-width: 58ch;
+    margin: 1rem 0 0;
+    color: #414141;
+    line-height: 1.6;
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    margin-top: 1.2rem;
+    color: #4a4a4a;
+    font-size: 0.75rem;
+  }
+
+  .prose {
+    padding-block: clamp(2.5rem, 7vw, 4rem);
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(1rem, 2.8vw, 1.08rem);
+    line-height: 1.8;
+  }
+
+  .prose :global(> :first-child) {
+    margin-top: 0;
+  }
+
+  .prose :global(> :last-child) {
+    margin-bottom: 0;
+  }
+
+  .prose :global(h2),
+  .prose :global(h3) {
+    margin: 2.5em 0 0.75em;
+    font-family:
+      ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+      "Courier New", monospace;
+    font-weight: 600;
+    letter-spacing: -0.04em;
+    line-height: 1.25;
+  }
+
+  .prose :global(p),
+  .prose :global(ul),
+  .prose :global(ol),
+  .prose :global(blockquote),
+  .prose :global(pre) {
+    margin-block: 1.4em;
+  }
+
+  .prose :global(code),
+  .prose :global(pre) {
+    font-family:
+      ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+      "Courier New", monospace;
+  }
+
+  .prose :global(code) {
+    font-size: 0.9em;
+  }
+
+  .prose :global(pre) {
+    overflow-x: auto;
+    padding: 1rem;
+    border: 1px solid rgb(51 51 51 / 24%);
+    background: rgb(51 51 51 / 7%);
+    font-size: 0.85rem;
+    line-height: 1.6;
+  }
+
+  .prose :global(img) {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+
+  .engagement {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+    padding-block: 1.5rem;
+    border-block: 1px solid rgb(51 51 51 / 28%);
+  }
+
+  .like-status {
+    font-size: 0.75rem;
+  }
+
+  button {
+    min-height: 2.75rem;
+    padding: 0.6rem 0.9rem;
+    border: 1px solid rgb(51 51 51 / 55%);
+    background: transparent;
+    cursor: pointer;
+  }
+
+  button:hover:not(:disabled),
+  .like-button[data-liked="true"] {
+    background: rgb(51 51 51 / 10%);
+  }
+
+  button:disabled {
+    cursor: wait;
+    opacity: 0.55;
+  }
+
+  .comments {
+    padding-top: clamp(3rem, 8vw, 5rem);
+  }
+
+  .comments > h2 {
+    margin: 0 0 2rem;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  .comment-count {
+    font-weight: 400;
+  }
+
+  .comments-list {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  :global(.comment) {
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid rgb(51 51 51 / 20%);
+  }
+
+  :global(.comment header) {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+  }
+
+  :global(.comment strong) {
+    font-size: 0.9rem;
+  }
+
+  :global(.comment time) {
+    color: #4a4a4a;
+    font-size: 0.7rem;
+  }
+
+  :global(.comment p) {
+    margin: 0.8rem 0 0;
+    font-family: Georgia, "Times New Roman", serif;
+    line-height: 1.65;
+    white-space: pre-wrap;
+  }
+
+  .no-comments {
+    margin: 0;
+    color: #4a4a4a;
+    font-size: 0.85rem;
+  }
+
+  .comment-form {
+    display: grid;
+    gap: 1.25rem;
+    margin-top: 2.5rem;
+  }
+
+  .field {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  label {
+    font-size: 0.8rem;
+  }
+
+  input,
+  textarea {
+    width: 100%;
+    border: 1px solid rgb(51 51 51 / 55%);
+    border-radius: 0;
+    background: rgb(255 255 255 / 7%);
+  }
+
+  input {
+    min-height: 2.75rem;
+    padding: 0.6rem 0.75rem;
+  }
+
+  textarea {
+    min-height: 8rem;
+    padding: 0.75rem;
+    line-height: 1.5;
+    resize: vertical;
+  }
+
+  .honeypot {
+    position: absolute;
+    left: -10000px;
+  }
+
+  .form-footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1rem;
+  }
+
+  .form-status {
+    margin: 0;
+    font-size: 0.75rem;
+  }
+
+  @media (max-width: 30rem) {
+    main {
+      width: min(100% - 2rem, 46rem);
+    }
+
+    :global(.comment header) {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+  }
+</style>

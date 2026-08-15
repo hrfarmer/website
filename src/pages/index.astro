@@ -1,4 +1,6 @@
 ---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
 const links = [
   { label: "github", href: "https://github.com/hrfarmer", external: true },
   { label: "blog", href: "/blog" },
@@ -6,56 +8,30 @@ const links = [
 ];
 ---
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
-    <meta name="description" content="zltl on the web" />
-    <title>zltl</title>
-  </head>
-  <body>
-    <main>
-      <h1>zltl</h1>
+<BaseLayout title="zltl">
+  <main>
+    <h1>zltl</h1>
 
-      <nav aria-label="Links">
-        {
-          links.map((link, index) => (
-            <>
-              {index > 0 && <span aria-hidden="true">·</span>}
-              <a
-                href={link.href}
-                target={link.external ? "_blank" : undefined}
-                rel={link.external ? "noreferrer" : undefined}
-              >
-                {link.label}
-              </a>
-            </>
-          ))
-        }
-      </nav>
-    </main>
-  </body>
-</html>
+    <nav aria-label="Links">
+      {
+        links.map((link, index) => (
+          <>
+            {index > 0 && <span aria-hidden="true">·</span>}
+            <a
+              href={link.href}
+              target={link.external ? "_blank" : undefined}
+              rel={link.external ? "noreferrer" : undefined}
+            >
+              {link.label}
+            </a>
+          </>
+        ))
+      }
+    </nav>
+  </main>
+</BaseLayout>
 
 <style>
-  :global(*) {
-    box-sizing: border-box;
-  }
-
-  :global(html) {
-    background: #999999;
-  }
-
-  :global(body) {
-    margin: 0;
-    background: #999999;
-    color: #333333;
-    font-family:
-      ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
-      "Courier New", monospace;
-  }
-
   main {
     display: flex;
     min-height: 100vh;
@@ -85,22 +61,9 @@ const links = [
   }
 
   a {
-    color: inherit;
     font-size: clamp(0.9rem, 3.5vw, 1rem);
     line-height: 1.5;
-    text-decoration-thickness: 1px;
-    text-underline-offset: 0.25em;
     transition: color 150ms ease;
-  }
-
-  a:hover {
-    color: #202020;
-  }
-
-  a:focus-visible {
-    border-radius: 2px;
-    outline: 2px solid currentColor;
-    outline-offset: 4px;
   }
 
   @media (prefers-reduced-motion: reduce) {
